@@ -178,16 +178,19 @@
                 alert('Por favor, completa esta categoría antes de enviar.');
                 return;
             }
+
             // Validación adicional para links de Discord
             if (input.type === 'url' && !isDiscordLink(input.value)) {
                 alert('Por favor, ingresa un link válido de Discord.');
                 return;
             }
+
             // Verificar si ya envió (basado en navegador)
             if (localStorage.getItem('submitted')) {
                 alert('Ya has enviado tus nominaciones.');
                 return;
             }
+
             // Recopilar datos
             const nominations = {
                 mejorJugador: document.getElementById('mejorJugador').value,
@@ -199,8 +202,9 @@
                 dibujoAno: document.getElementById('dibujoAno').value,
                 mejorClip: document.getElementById('mejorClip').value
             };
+
             // Enviar a Google Apps Script (reemplaza con tu URL)
-            fetch('https://script.google.com/macros/s/AKfycbxkaNMorgvOPYACcwi2YVEaAGIUkY6LgeALnIUnvNwjz8e9fzK3VG1lrLLwTRPjjOJj/exec', {
+            fetch('https://script.google.com/macros/s/AKfycbwPivbdJIJK0M1hBzC1oqxprZaADzSK45eHCma_nF19zYc-8iHJ_C7jR4QOFXE-dLi3/exec', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -224,6 +228,7 @@
                 alert('Error al enviar. Intenta de nuevo.');
             });
         });
+
     </script>
 </body>
 </html>
