@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Awars 2025 - Among Us Español</title>
+    <!-- Incluir EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>
         body {
-            font-family: 'Georgia', serif; /* Fuente elegante */
-            background: linear-gradient(135deg, #000000, #1a1a1a); /* Gradiente negro para casino */
-            color: #FFD700; /* Amarillo dorado */
+            font-family: 'Georgia', serif; 
+            background: linear-gradient(135deg, #000000, #1a1a1a); 
+            color: #FFD700; 
             margin: 0;
             padding: 0;
             display: flex;
@@ -16,17 +18,20 @@
             align-items: center;
             height: 100vh;
             overflow: hidden;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Brillo sutil */
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); 
         }
         .container {
             text-align: center;
             max-width: 600px;
             width: 100%;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.8); /* Fondo semi-transparente negro */
+            background: rgba(0, 0, 0, 0.8); 
             border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); /* Sombra dorada */
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); 
             border: 2px solid #FFD700;
+        }
+        .welcome {
+            animation: fadeIn 1s ease-in-out;
         }
         .category {
             display: none;
@@ -48,11 +53,11 @@
         }
         input:focus, textarea:focus {
             outline: none;
-            border-color: #FFA500; /* Naranja dorado en foco */
+            border-color: #FFA500; 
             box-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
         }
         button {
-            background: linear-gradient(45deg, #FFD700, #FFA500); /* Gradiente dorado */
+            background: linear-gradient(45deg, #FFD700, #FFA500); 
             color: #000000;
             border: none;
             padding: 15px 30px;
@@ -74,6 +79,10 @@
             color: #FFD700;
             margin-bottom: 20px;
             text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -133,20 +142,39 @@
     </div>
 
     <script>
+        // Configuración de EmailJS (reemplaza con tus valores)
+        const EMAILJS_SERVICE_ID = 'service_sofoc59'; // ID del servicio en EmailJS
+        const EMAILJS_TEMPLATE_ID = 'template_si8isbd'; // ID de la plantilla de email (configurada para enviar a Gmail)
+        const EMAILJS_PUBLIC_KEY = '_51MzCi8b6ZvjIY0M'; // Clave pública de EmailJS
+
         const form = document.getElementById('form');
         const categories = document.querySelectorAll('.category');
         const nextBtns = document.querySelectorAll('.nextBtn');
         const submitBtn = document.getElementById('submitBtn');
 
         let currentCategory = 0;
+        let userId = null;
+
+        // Inicializar EmailJS
+        emailjs.init(EMAILJS_PUBLIC_KEY);
 
         // Función para validar si es un link de Discord
         function isDiscordLink(url) {
             return url.startsWith('https://discord.com/') || url.startsWith('https://discordapp.com/');
         }
 
-        // Iniciar con la primera categoría activa
-        categories[currentCategory].classList.add('active');
+        // Verificar si hay un código en la URL (después del redirect del link externo)
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (code) {
+            // Usar el código como identificador de usuario (asumiendo que es el ID de Discord)
+            userId = code;
+            // Verificar si ya envió con este código
+            if (localStorage.getItem(`submitted_${userId}`)) {
+                alert('Ya has enviado tus nominaciones.');
+                return;
+            }
+        }
 
         nextBtns.forEach((btn, index) => {
             btn.addEventListener('click', () => {
@@ -173,26 +201,28 @@
         });
 
         submitBtn.addEventListener('click', () => {
+            if (!userId) {
+                alert('Debes verificar con el link externo primero.');
+                return;
+            }
             const input = categories[currentCategory].querySelector('input, textarea');
             if (!input.value.trim()) {
                 alert('Por favor, completa esta categoría antes de enviar.');
                 return;
             }
-
             // Validación adicional para links de Discord
             if (input.type === 'url' && !isDiscordLink(input.value)) {
                 alert('Por favor, ingresa un link válido de Discord.');
                 return;
             }
-
-            // Verificar si ya envió (basado en navegador)
-            if (localStorage.getItem('submitted')) {
+            // Verificar si ya envió con este código
+            if (localStorage.getItem(`submitted_${userId}`)) {
                 alert('Ya has enviado tus nominaciones.');
                 return;
             }
-
             // Recopilar datos
             const nominations = {
+                userId: userId,
                 mejorJugador: document.getElementById('mejorJugador').value,
                 mejorEvento: document.getElementById('mejorEvento').value,
                 juegoFavorito: document.getElementById('juegoFavorito').value,
@@ -202,33 +232,20 @@
                 dibujoAno: document.getElementById('dibujoAno').value,
                 mejorClip: document.getElementById('mejorClip').value
             };
-
-            // Enviar a Google Apps Script (reemplaza con tu URL)
-            fetch('https://script.google.com/macros/s/AKfycbxCty-UOr3pGzwmkG_gWSnjQSZos3-ZppAr8MafE-XkMfcHOPShCGFXQsCIDu7qdf4s/exec', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(nominations),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
+            // Enviar email con EmailJS (configurado para enviar a Gmail)
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, nominations)
+                .then((response) => {
+                    console.log('Email enviado:', response);
                     // Marcar como enviado
-                    localStorage.setItem('submitted', 'true');
+                    localStorage.setItem(`submitted_${userId}`, 'true');
                     alert('¡Nominaciones enviadas exitosamente!');
                     // Reiniciar o redirigir
                     location.reload();
-                } else {
+                }, (error) => {
+                    console.error('Error al enviar email:', error);
                     alert('Error al enviar. Intenta de nuevo.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error al enviar. Intenta de nuevo.');
-            });
+                });
         });
-
     </script>
 </body>
 </html>
