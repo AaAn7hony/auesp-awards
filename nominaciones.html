@@ -28,166 +28,127 @@
             box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
             border: 2px solid #FFD700;
         }
-        .category {
-            display: none;
-            animation: slideIn 0.5s ease-in-out;
-        }
-        .category.active {
-            display: block;
-        }
+        .category { display: none; animation: slideIn 0.5s ease-in-out; }
+        .category.active { display: block; }
+
         input, textarea {
-            width: 100%;
-            padding: 15px;
-            margin: 15px 0;
+            width: 100%; padding: 15px; margin: 15px 0;
             border: 2px solid #FFD700;
             border-radius: 10px;
-            background-color: #000000;
-            color: #FFD700;
+            background-color: #000; color: #FFD700;
             font-size: 16px;
-            box-shadow: inset 0 0 10px rgba(255, 215, 0, 0.2);
         }
+
         button {
             background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: #000000;
-            border: none;
-            padding: 15px 30px;
+            color: #000;
+            border: none; padding: 15px 30px;
             border-radius: 10px;
             cursor: pointer;
-            margin: 15px;
-            font-weight: bold;
-            font-size: 16px;
-            text-transform: uppercase;
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-            transition: 0.3s ease;
+            margin: 15px; font-weight: bold;
         }
-        button:hover {
-            background: linear-gradient(45deg, #FFA500, #FFD700);
-            transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
-        }
-        h1, h2 {
-            color: #FFD700;
-            margin-bottom: 20px;
-            text-shadow: 0 0 15px rgba(255, 215, 0, 0.7);
-        }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(-100%); opacity: 0; }
-        }
+        button:hover { transform: scale(1.05); }
     </style>
 
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>
-        emailjs.init("_51MzCi8b6ZvjIY0M");
-    </script>
+    <script> emailjs.init("_51MzCi8b6ZvjIY0M"); </script>
 </head>
 
 <body>
 
-    <div class="container">
+<script>
+// -------------------------
+// LEER DATOS DEL USUARIO
+// -------------------------
+const discordId = localStorage.getItem("discord_user_id");
+const discordName = localStorage.getItem("discord_user_name");
 
-        <div id="form">
+// Usuario no logueado
+if (!discordId) {
+    alert("Debes iniciar sesión con Discord primero");
+    window.location.href = "index.html";
+}
 
-            <div class="category active" id="cat1">
-                <h2>Mejor jugador</h2>
-                <textarea id="mejorJugador"></textarea>
-                <button class="nextBtn">Siguiente</button>
-            </div>
+// Ya envió
+if (localStorage.getItem(`submitted_${discordId}`)) {
+    alert("Ya enviaste tus nominaciones.");
+    window.location.href = "index.html";
+}
+</script>
 
-            <div class="category" id="cat2">
-                <h2>Mejor evento</h2>
-                <textarea id="mejorEvento"></textarea>
-                <button class="nextBtn">Siguiente</button>
-            </div>
+<div class="container">
 
-            <div class="category" id="cat3">
-                <h2>Juego favorito</h2>
-                <textarea id="juegoFavorito"></textarea>
-                <button class="nextBtn">Siguiente</button>
-            </div>
+    <div id="form">
 
-            <div class="category" id="cat4">
-                <h2>MVP</h2>
-                <textarea id="mvp"></textarea>
-                <button class="nextBtn">Siguiente</button>
-            </div>
-
-            <div class="category" id="cat5">
-                <h2>Usuario favorito</h2>
-                <textarea id="usuarioFavorito"></textarea>
-                <button class="nextBtn">Siguiente</button>
-            </div>
-
-            <div class="category" id="cat6">
-                <h2>Artista del año</h2>
-                <textarea id="artistaAno"></textarea>
-                <button class="nextBtn">Siguiente</button>
-            </div>
-
-            <div class="category" id="cat7">
-                <h2>Dibujo del año</h2>
-                <input type="url" id="dibujoAno" placeholder="Link de Discord">
-                <button class="nextBtn">Siguiente</button>
-            </div>
-
-            <div class="category" id="cat8">
-                <h2>Mejor clip</h2>
-                <input type="url" id="mejorClip" placeholder="Link de Discord">
-                <button id="submitBtn">Enviar Nominaciones</button>
-            </div>
-
+        <div class="category active" id="cat1">
+            <h2>Mejor jugador</h2>
+            <textarea id="mejorJugador"></textarea>
+            <button class="nextBtn">Siguiente</button>
         </div>
-    </div>
 
+        <div class="category" id="cat2">
+            <h2>Mejor evento</h2>
+            <textarea id="mejorEvento"></textarea>
+            <button class="nextBtn">Siguiente</button>
+        </div>
+
+        <div class="category" id="cat3">
+            <h2>Juego favorito</h2>
+            <textarea id="juegoFavorito"></textarea>
+            <button class="nextBtn">Siguiente</button>
+        </div>
+
+        <div class="category" id="cat4">
+            <h2>MVP</h2>
+            <textarea id="mvp"></textarea>
+            <button class="nextBtn">Siguiente</button>
+        </div>
+
+        <div class="category" id="cat5">
+            <h2>Usuario favorito</h2>
+            <textarea id="usuarioFavorito"></textarea>
+            <button class="nextBtn">Siguiente</button>
+        </div>
+
+        <div class="category" id="cat6">
+            <h2>Artista del año</h2>
+            <textarea id="artistaAno"></textarea>
+            <button class="nextBtn">Siguiente</button>
+        </div>
+
+        <div class="category" id="cat7">
+            <h2>Dibujo del año</h2>
+            <input type="url" id="dibujoAno" placeholder="Link de Discord">
+            <button class="nextBtn">Siguiente</button>
+        </div>
+
+        <div class="category" id="cat8">
+            <h2>Mejor clip</h2>
+            <input type="url" id="mejorClip" placeholder="Link de Discord">
+            <button id="submitBtn">Enviar Nominaciones</button>
+        </div>
+
+    </div>
+</div>
 
 <script>
-    const categories = document.querySelectorAll('.category');
-    const nextBtns = document.querySelectorAll('.nextBtn');
-    const submitBtn = document.getElementById('submitBtn');
+const categories = document.querySelectorAll('.category');
+const nextBtns = document.querySelectorAll('.nextBtn');
+const submitBtn = document.getElementById('submitBtn');
 
-    let currentCategory = 0;
+let currentCategory = 0;
 
-    function isDiscordLink(url) {
-        return url.startsWith('https://discord.com/') || url.startsWith('https://discordapp.com/');
-    }
+function isDiscordLink(url) {
+    return url.startsWith('https://discord.com/') || url.startsWith('https://discordapp.com/');
+}
 
-    nextBtns.forEach((btn) => {
-        btn.addEventListener('click', () => {
-            const input = categories[currentCategory].querySelector('input, textarea');
-
-            if (!input.value.trim()) {
-                alert('Por favor, completa esta categoría.');
-                return;
-            }
-
-            if (input.type === 'url' && !isDiscordLink(input.value)) {
-                alert('Ingresa un link válido de Discord.');
-                return;
-            }
-
-            categories[currentCategory].style.animation = 'slideOut 0.5s ease-in-out';
-
-            setTimeout(() => {
-                categories[currentCategory].classList.remove('active');
-                currentCategory++;
-
-                if (currentCategory < categories.length) {
-                    categories[currentCategory].classList.add('active');
-                }
-            }, 500);
-        });
-    });
-
-    submitBtn.addEventListener('click', () => {
+nextBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
         const input = categories[currentCategory].querySelector('input, textarea');
 
         if (!input.value.trim()) {
-            alert('Completa esta categoría antes de enviar.');
+            alert('Por favor, completa esta categoría.');
             return;
         }
 
@@ -196,28 +157,57 @@
             return;
         }
 
-        const nominations = {
-            mejorJugador: document.getElementById('mejorJugador').value,
-            mejorEvento: document.getElementById('mejorEvento').value,
-            juegoFavorito: document.getElementById('juegoFavorito').value,
-            mvp: document.getElementById('mvp').value,
-            usuarioFavorito: document.getElementById('usuarioFavorito').value,
-            artistaAno: document.getElementById('artistaAno').value,
-            dibujoAno: document.getElementById('dibujoAno').value,
-            mejorClip: document.getElementById('mejorClip').value
-        };
-
-        emailjs.send("service_sofoc59", "template_si8isbd", nominations) 
-        .then(() => {
-            alert("¡Nominaciones enviadas correctamente!");
-            location.reload();
-        })
-        .catch((error) => {
-            alert("Error al enviar. Intenta de nuevo.");
-            console.error(error);
-        });
+        categories[currentCategory].classList.remove('active');
+        currentCategory++;
+        categories[currentCategory].classList.add('active');
     });
+});
+
+
+submitBtn.addEventListener('click', () => {
+    const input = categories[currentCategory].querySelector('input, textarea');
+
+    if (!input.value.trim()) {
+        alert('Completa esta categoría antes de enviar.');
+        return;
+    }
+
+    if (input.type === 'url' && !isDiscordLink(input.value)) {
+        alert('Ingresa un link válido de Discord.');
+        return;
+    }
+
+    const nominations = {
+        mejorJugador: document.getElementById('mejorJugador').value,
+        mejorEvento: document.getElementById('mejorEvento').value,
+        juegoFavorito: document.getElementById('juegoFavorito').value,
+        mvp: document.getElementById('mvp').value,
+        usuarioFavorito: document.getElementById('usuarioFavorito').value,
+        artistaAno: document.getElementById('artistaAno').value,
+        dibujoAno: document.getElementById('dibujoAno').value,
+        mejorClip: document.getElementById('mejorClip').value,
+
+        // LO QUE PEDISTE: enviar discord ID + username al Gmail
+        discord_id: discordId,
+        discord_username: discordName
+    };
+
+    emailjs.send("service_sofoc59", "template_si8isbd", nominations) 
+    .then(() => {
+        alert("¡Nominaciones enviadas correctamente!");
+
+        // Guardar bloqueo de envío
+        localStorage.setItem(`submitted_${discordId}`, "true");
+
+        location.reload();
+    })
+    .catch((error) => {
+        alert("Error al enviar. Intenta de nuevo.");
+        console.error(error);
+    });
+});
 </script>
 
 </body>
 </html>
+
