@@ -1,76 +1,44 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Awars 2025 - Among Us Español</title>
     <style>
         body {
             font-family: 'Georgia', serif;
             background: linear-gradient(135deg, #000000, #1a1a1a);
-            color: #FFD700;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: hidden;
-            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            color: #FFD700; margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            height: 100vh; overflow: hidden; text-shadow: 0 0 10px rgba(255,215,0,0.5);
         }
-        .container {
-            text-align: center;
-            max-width: 600px;
-            width: 100%;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.8);
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-            border: 2px solid #FFD700;
-        }
-        .category { display: none; animation: slideIn 0.5s ease-in-out; }
-        .category.active { display: block; }
-
-        input, textarea {
-            width: 100%; padding: 15px; margin: 15px 0;
-            border: 2px solid #FFD700;
-            border-radius: 10px;
-            background-color: #000; color: #FFD700;
-            font-size: 16px;
-        }
-
-        button {
-            background: linear-gradient(45deg, #FFD700, #FFA500);
-            color: #000;
-            border: none; padding: 15px 30px;
-            border-radius: 10px;
-            cursor: pointer;
-            margin: 15px; font-weight: bold;
-        }
-        button:hover { transform: scale(1.05); }
+        .container { text-align:center; max-width:600px; width:100%; padding:20px; background:rgba(0,0,0,0.8); border-radius:15px; box-shadow:0 0 20px rgba(255,215,0,0.3); border:2px solid #FFD700; }
+        .category { display:none; animation: slideIn 0.5s ease-in-out; }
+        .category.active { display:block; }
+        input, textarea { width:100%; padding:15px; margin:15px 0; border:2px solid #FFD700; border-radius:10px; background:#000; color:#FFD700; font-size:16px; }
+        button { background: linear-gradient(45deg,#FFD700,#FFA500); color:#000; border:none; padding:15px 30px; border-radius:10px; cursor:pointer; margin:15px; font-weight:bold;}
+        button:hover { transform: scale(1.03); }
+        @keyframes slideIn { from { transform: translateX(100%); opacity:0 } to { transform: translateX(0); opacity:1 } }
     </style>
 
     <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script> emailjs.init("_51MzCi8b6ZvjIY0M"); </script>
 </head>
-
 <body>
 
 <script>
-// -------------------------
-// LEER DATOS DEL USUARIO
-// -------------------------
+// LEER DATOS GUARDADOS POR index.html
 const discordId = localStorage.getItem("discord_user_id");
 const discordName = localStorage.getItem("discord_user_name");
 
-// Usuario no logueado
+// Si no hay datos, volver al index para login
 if (!discordId) {
-    alert("Debes iniciar sesión con Discord primero");
+    alert("Debes iniciar sesión con Discord primero.");
     window.location.href = "index.html";
 }
 
-// Ya envió
+// Si ya envió, evitar reenviar
 if (localStorage.getItem(`submitted_${discordId}`)) {
     alert("Ya enviaste tus nominaciones.");
     window.location.href = "index.html";
@@ -78,9 +46,7 @@ if (localStorage.getItem(`submitted_${discordId}`)) {
 </script>
 
 <div class="container">
-
     <div id="form">
-
         <div class="category active" id="cat1">
             <h2>Mejor jugador</h2>
             <textarea id="mejorJugador"></textarea>
@@ -128,7 +94,6 @@ if (localStorage.getItem(`submitted_${discordId}`)) {
             <input type="url" id="mejorClip" placeholder="Link de Discord">
             <button id="submitBtn">Enviar Nominaciones</button>
         </div>
-
     </div>
 </div>
 
@@ -136,7 +101,6 @@ if (localStorage.getItem(`submitted_${discordId}`)) {
 const categories = document.querySelectorAll('.category');
 const nextBtns = document.querySelectorAll('.nextBtn');
 const submitBtn = document.getElementById('submitBtn');
-
 let currentCategory = 0;
 
 function isDiscordLink(url) {
@@ -151,7 +115,6 @@ nextBtns.forEach((btn) => {
             alert('Por favor, completa esta categoría.');
             return;
         }
-
         if (input.type === 'url' && !isDiscordLink(input.value)) {
             alert('Ingresa un link válido de Discord.');
             return;
@@ -163,7 +126,6 @@ nextBtns.forEach((btn) => {
     });
 });
 
-
 submitBtn.addEventListener('click', () => {
     const input = categories[currentCategory].querySelector('input, textarea');
 
@@ -171,7 +133,6 @@ submitBtn.addEventListener('click', () => {
         alert('Completa esta categoría antes de enviar.');
         return;
     }
-
     if (input.type === 'url' && !isDiscordLink(input.value)) {
         alert('Ingresa un link válido de Discord.');
         return;
@@ -187,19 +148,18 @@ submitBtn.addEventListener('click', () => {
         dibujoAno: document.getElementById('dibujoAno').value,
         mejorClip: document.getElementById('mejorClip').value,
 
-        // LO QUE PEDISTE: enviar discord ID + username al Gmail
+        // Campos adicionales solicitados: quien envía
         discord_id: discordId,
         discord_username: discordName
     };
 
-    emailjs.send("service_sofoc59", "template_si8isbd", nominations) 
+    emailjs.send("service_sofoc59", "template_si8isbd", nominations)
     .then(() => {
         alert("¡Nominaciones enviadas correctamente!");
-
-        // Guardar bloqueo de envío
+        // Marcar como enviado para este usuario (evitar reenvío)
         localStorage.setItem(`submitted_${discordId}`, "true");
-
-        location.reload();
+        // opcional: redirigir a una página de gracias
+        window.location.href = "index.html";
     })
     .catch((error) => {
         alert("Error al enviar. Intenta de nuevo.");
@@ -210,4 +170,3 @@ submitBtn.addEventListener('click', () => {
 
 </body>
 </html>
-
