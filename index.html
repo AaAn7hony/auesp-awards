@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>AWARDS 2025 - AUEsp</title>
     <link rel="stylesheet" href="css/index.css">
 </head>
@@ -28,11 +28,9 @@
 <script>
 const glow = document.getElementById('glow');
 const size = 50;
-
 document.addEventListener('mousemove', (event) => {
     const x = event.clientX;
     const y = event.clientY;
-
     glow.style.background = `
       radial-gradient(
         circle ${size}px at ${x}px ${y}px,
@@ -44,64 +42,75 @@ document.addEventListener('mousemove', (event) => {
 </script>
 
 <script>
-    const CLIENT_ID = '1205103896796725278';
-    const REDIRECT_URI = 'https://aaan7hony.github.io/auesp-awards/nominaciones.html';
-    const SCOPE = 'identify';
+/*
+  CORRECCIÓN IMPORTANTE:
+  - REDIRECT_URI apunta a ESTA página (index.html) para que el intercambio de "code" por token
+    se haga aquí y podamos guardar en localStorage antes de ir a nominaciones.html.
+  - Cambia CLIENT_SECRET por tu valor real en un backend cuando puedas. No es seguro ponerlo
+    en frontend en producción.
+*/
+const CLIENT_ID = '1205103896796725278';
+const REDIRECT_URI = 'https://aaan7hony.github.io/auesp-awards/index.html'; // <-- apunta a index.html
+const SCOPE = 'identify';
 
-    const loginBtn = document.getElementById('loginBtn');
+const loginBtn = document.getElementById('loginBtn');
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
+// Si volvimos de Discord con "code", procesarlo aquí
+const urlParams = new URLSearchParams(window.location.search);
+const code = urlParams.get('code');
 
-    if (code) {
-        fetch("https://discord.com/api/oauth2/token", {
-            method: "POST",
-            headers: { "Content-Type": "application/x-www-form-urlencoded" },
-            body: new URLSearchParams({
-                client_id: CLIENT_ID,
-                client_secret: "-wZjSAFytLiT-7yhxtrV6Nq6hHFegami",
-                grant_type: "authorization_code",
-                code: code,
-                redirect_uri: REDIRECT_URI
-            })
+if (code) {
+    // Intercambiar code por access token
+    fetch("https://discord.com/api/oauth2/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+            client_id: CLIENT_ID,
+            client_secret: "TU_CLIENT_SECRET_AQUI", // reemplaza por tu secret (idealmente hazlo en el backend)
+            grant_type: "authorization_code",
+            code: code,
+            redirect_uri: REDIRECT_URI
         })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.access_token) throw new Error("Error token");
-
-            return fetch("https://discord.com/api/users/@me", {
-                headers: { Authorization: `Bearer ${data.access_token}` }
-            });
-        })
-        .then(res => res.json())
-        .then(user => {
-            // Guardar para que el segundo código lo lea
-            localStorage.setItem("discord_user_id", user.id);
-            localStorage.setItem("discord_user_name", user.username);
-
-            // Verificar si ya envió
-            if (localStorage.getItem(`submitted_${user.id}`)) {
-                alert("Ya has enviado tus nominaciones.");
-                return;
-            }
-
-            // Ir al formulario
-            window.location.href = "nominaciones.html";
-        })
-        .catch(err => {
-            console.error(err);
-            alert("Error en login. Intenta otra vez.");
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.access_token) throw new Error("No se obtuvo access_token");
+        // Obtener info del usuario
+        return fetch("https://discord.com/api/users/@me", {
+            headers: { Authorization: `Bearer ${data.access_token}` }
         });
-    }
+    })
+    .then(res => res.json())
+    .then(user => {
+        // Guardar ID y username para que nominaciones.html lo use
+        localStorage.setItem("discord_user_id", user.id);
+        localStorage.setItem("discord_user_name", user.username);
 
-    loginBtn.addEventListener("click", () => {
-        window.location.href = 
-        `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${SCOPE}`;
+        // Si ya envió antes, podemos avisar; igual lo redirigimos
+        if (localStorage.getItem(`submitted_${user.id}`)) {
+            alert("Ya enviaste tus nominaciones.");
+            // opcional: redirigir a una página de 'ya enviado' o volver al index
+            window.location.href = "nominaciones.html";
+            return;
+        }
+
+        // Redirigir al formulario con todo listo
+        window.location.href = "nominaciones.html";
+    })
+    .catch(err => {
+        console.error("Error OAuth:", err);
+        alert("Error en el proceso de login. Intenta de nuevo.");
+        // limpiar query param para evitar reintentos infinitos
+        window.history.replaceState({}, document.title, window.location.pathname);
     });
+}
+
+// Evento del botón para iniciar OAuth (redirige a Discord)
+loginBtn.addEventListener("click", () => {
+    const authUrl = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=${SCOPE}`;
+    window.location.href = authUrl;
+});
 </script>
 
 </body>
 </html>
-
-
-
